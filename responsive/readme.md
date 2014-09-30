@@ -1,4 +1,4 @@
-### Lab `#4: Responsive CSS
+### Lab #4: Responsive CSS
 
 #### By Ben Tanen
 
