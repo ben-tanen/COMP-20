@@ -28,3 +28,7 @@
 #lyrics p:last-of-type {
 	color: #77bdee;
 }
+
+#lyrics img {
+	width: 200px;
+}
