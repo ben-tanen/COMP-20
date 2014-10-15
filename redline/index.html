@@ -7,43 +7,67 @@
 	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=true&amp;libraries=places"></script>
 	</script>
 	<script type="text/javascript">	
-		// standard tufts coordinates
-		var lat = 42.4060269;
-	    var lng = -71.118939;
-
-	    // create XHR object
-	    xhr = new XMLHttpRequest();
-
-	    // open connection with MBTA Redline (JSON file)
-	    xhr.open('get', 'http://developer.mbta.com/lib/rthr/red.json', true);
-
-	    // if change in readystate, update pins
-	    xhr.onreadystatechange = function() {
-	    	if (xhr.readyState == 4 && xhr.status == 200) {
-	    		data = JSON.parse(xhr.responseText);
-	    		for (i=0;i<data["TripList"]["Trips"].length;i++){
-	    			// place pin for each train
-	    			// get train lat / long
-	    			// pass values to googleMapsPin(lat,lng)
-	    		}
-	    	} else if (xhr.readyState == 4) {
-	    		console.log('There was an error retrieving MBTA data.');
-	    	}
-	    };
-
-	    xhr.send();
+		
 
 	    // initialize google map
 		function initialize() {
+			// standard tufts coordinates
+			var init_lat = 42.4060269;
+	    	var init_lng = -71.118939;
+
+	    	// set the map options (zoom and location)
 			var mapOptions = {
-				center: { lat: lat, lng: lng},
+				center: {lat: init_lat, lng: init_lng},
 				zoom: 12
 			};
+
+			// create the map
 			var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+			// set a marker at Davis Sqr
+			var marker = new google.maps.Marker({
+			    position: {lat: 42.396791, lng: -71.121861},
+			    map: map,
+			});
+			var infowindow = new google.maps.InfoWindow({
+		    	content: "This is the Davis Square station. There is probably a train here, but I dont't know for sure..."
+		    });
+		    google.maps.event.addListener(marker, 'click', function() {
+				infowindow.open(map,marker);
+			});
+
+			// create XHR object
+		    xhr = new XMLHttpRequest();
+
+		    // open connection with MBTA Redline (JSON file)
+		    xhr.open('get', 'http://developer.mbta.com/lib/rthr/red.json', true);
+
+		    // if change in readystate, update pins
+		    xhr.onreadystatechange = function() {
+		    	if (xhr.readyState == 4 && xhr.status == 200) {
+		    		data = JSON.parse(xhr.responseText);
+		    		var markers;
+
+		    		// for each train in "trips", place a pin
+		    		for (i=0;i<data["TripList"]["Trips"].length;i++){
+		    			var trip = data["TripList"]["Trips"][i];
+		    			var pin_lat = trip["Position"]["Lat"];
+		    			var pin_lng = trip["Position"]["Long"];
+		    			markers[i] = new google.maps.Marker({
+						    position: {lat: pin_lat, lng: pin_lng},
+						    map: map
+						});
+		    		}
+		    	} else if (xhr.readyState == 4) {
+		    		console.log('There was an error retrieving the MBTA data.');
+		    	}
+		    };
+		    xhr.send();
 		}
 
 		// call google map on page load
 		google.maps.event.addDomListener(window, 'load', initialize);
+
 	</script>
 </head>
 
