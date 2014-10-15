@@ -5,10 +5,20 @@
 	<title>Marauder's Map</title>
 	<link rel="stylesheet" href="style.css">
 	<script>
+		if (navigator.geolocation){
+			getLocation();
+		} else {
+			console.log("Error in Navigator")
+		}
+
+		function getLocation() {
+			navigator.geolocation.getCurrentPosition(function(position) {
+				console.log(position.coords.latitude + position.coords.longitude);
+			});
+		}
 	</script>
 </head>
 <body>
-	<p>Assignment #2</p>
-	<p>Magical Map Under Construction</p>
+
 </body>
 </html>
