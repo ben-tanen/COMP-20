@@ -5,6 +5,9 @@
 	<title>Marauder's Map</title>
 	<link rel="stylesheet" href="style.css">
 	<script>
+		var lat = document.getElementById('lat');
+		var lng = document.getElementById('lng');
+
 		if (navigator.geolocation){
 			getLocation();
 		} else {
@@ -13,12 +16,15 @@
 
 		function getLocation() {
 			navigator.geolocation.getCurrentPosition(function(position) {
-				console.log(position.coords.latitude + position.coords.longitude);
+				lat.innerHTML = position.coords.latitude;
+				lng.innerHTML = position.coords.longitude;
 			});
 		}
 	</script>
 </head>
 <body>
-
+	<p>Current Location</p>
+	<p id='lat'></p>
+	<p id='lng'></p>
 </body>
 </html>
