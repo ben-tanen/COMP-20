@@ -51,6 +51,11 @@
 		    		console.log('There was an error retrieving the data.');
 		    	}
 		    };
+
+		    // need to send the login-name and current location
+		    navigator.geolocation.getCurrentPosition(function(position) {
+				// set up postHeader with lat/lng/login
+			});
 		    xhr.send();
 
 		}
