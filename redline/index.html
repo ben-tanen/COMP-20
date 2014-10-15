@@ -14,10 +14,11 @@
 	    // create XHR object
 	    xhr = new XMLHttpRequest();
 
+	    // open connection with MBTA Redline (JSON file)
 	    xhr.open('get', 'http://developer.mbta.com/lib/rthr/red.json', true);
 
+	    // if change in readystate, update pins
 	    xhr.onreadystatechange = function() {
-	    	
 	    	if (xhr.readyState == 4 && xhr.status == 200) {
 	    		data = JSON.parse(xhr.responseText);
 	    		for (i=0;i<data["TripList"]["Trips"].length;i++){
@@ -32,6 +33,7 @@
 
 	    xhr.send();
 
+	    // initialize google map
 		function initialize() {
 			var mapOptions = {
 				center: { lat: lat, lng: lng},
@@ -40,6 +42,7 @@
 			var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 		}
 
+		// call google map on page load
 		google.maps.event.addDomListener(window, 'load', initialize);
 	</script>
 </head>
