@@ -6,19 +6,46 @@
 	<link rel="stylesheet" href="style.css">
 	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=true&amp;libraries=places"></script>
 	</script>
-	<script type="text/javascript">
+	<script type="text/javascript">	
+		// standard tufts coordinates
+		var lat = 42.4060269;
+	    var lng = -71.118939;
+
+	    // create XHR object
+	    xhr = new XMLHttpRequest();
+
+	    xhr.open('get', 'http://developer.mbta.com/lib/rthr/red.json', true);
+
+	    xhr.onreadystatechange = function() {
+	    	
+	    	if (xhr.readyState == 4 && xhr.status == 200) {
+	    		data = JSON.parse(xhr.responseText);
+	    		for (i=0;i<data["TripList"]["Trips"].length;i++){
+	    			// place pin for each train
+	    			// get train lat / long
+	    			// pass values to googleMapsPin(lat,lng)
+	    		}
+	    	} else if (xhr.readyState == 4) {
+	    		console.log('There was an error retrieving MBTA data.');
+	    	}
+	    };
+
+	    xhr.send();
+
 		function initialize() {
 			var mapOptions = {
-				center: { lat: -34.397, lng: 150.644},
-				zoom: 8
+				center: { lat: lat, lng: lng},
+				zoom: 12
 			};
 			var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 		}
+
 		google.maps.event.addDomListener(window, 'load', initialize);
 	</script>
 </head>
 
 <body>
+	<p id='err_head'></p>
 	<div id="map-canvas"></div>
 </body>
 </html>
