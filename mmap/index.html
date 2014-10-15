@@ -44,8 +44,15 @@
 		    // if change in readystate, update pins
 		    xhr.onreadystatechange = function() {
 		    	if (xhr.readyState == 4 && xhr.status == 200) {
-		    		data = JSON.parse(xhr.responseText);
-		    		console.log(data);
+		    		var data = JSON.parse(xhr.responseText);
+		    		
+		    		character = getCharacter(data);
+		    		// put character pin
+
+		    		students = data["students"];
+		    		for (i=0;i<students.length;i++){
+		    			// put student pin
+		    		}
 
 		    	} else if (xhr.readyState == 4) {
 		    		console.log('There was an error retrieving the data.');
