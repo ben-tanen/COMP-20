@@ -32,9 +32,9 @@
 
 			if (navigator.geolocation){
 				navigator.geolocation.getCurrentPosition(function(position) {
+					pinLocation(position.coords.latitude,position.coords.longitude);
 					xhr.setRequestHeader("lat", position.coords.latitude);
 					xhr.setRequestHeader("lng", position.coords.longitude);
-					pinLocation(position.coords.latitude,position.coords.longitude);
 				});
 			} else {
 				console.log("Error in Navigator")
