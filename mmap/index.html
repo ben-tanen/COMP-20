@@ -23,7 +23,7 @@
 
 			xhr = new XMLHttpRequest();
 
-		    // open connection with MBTA Redline (JSON file)
+		    // open connection with sendLocation server
 		    xhr.open('post', 'http://chickenofthesea.herokuapp.com/sendLocation', true);
 
 		    xhr.setRequestHeader(
@@ -37,11 +37,10 @@
 					xhr.setRequestHeader("lng", position.coords.longitude);
 				});
 			} else {
-				console.log("Error in Navigator")
+				// console.log("Error in Navigator")
 			}
 
 			function pinLocation(input_lat,input_lng) {
-				console.log('in pin');
 				var marker = new google.maps.Marker({
 				    position: {lat: input_lat, lng: input_lng},
 				    map: map
@@ -67,7 +66,7 @@
 
 		    console.log(xhr.getAllResponseHeaders());
 
-		    xhr.send();
+		    xhr.send("");
 
 		}
 
