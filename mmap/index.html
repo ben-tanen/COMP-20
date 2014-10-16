@@ -27,17 +27,17 @@
 		    xhr.open('post', 'http://chickenofthesea.herokuapp.com/sendLocation', true);
 
 			if (navigator.geolocation){
-				pinLocation();
+				navigator.geolocation.getCurrentPosition(function(position) {
+					pinLocation(position.coords.latitude,position.coords.longitude);
+				});
 			} else {
 				console.log("Error in Navigator")
 			}
 
-			function pinLocation() {
-				navigator.geolocation.getCurrentPosition(function(position) {
-					var marker = new google.maps.Marker({
-					    position: {lat: position.coords.latitude, lng: position.coords.longitude},
-					    map: map
-					});
+			function pinLocation(input_lat,input_lng) {
+				var marker = new google.maps.Marker({
+				    position: {lat: input_lat, lng: input_lng},
+				    map: map
 				});
 			}
 
