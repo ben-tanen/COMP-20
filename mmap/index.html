@@ -24,7 +24,7 @@
 			xhr = new XMLHttpRequest();
 
 		    // open connection with MBTA Redline (JSON file)
-		    xhr.open('POST', 'http://chickenofthesea.herokuapp.com/sendLocation', true);
+		    xhr.open('post', 'http://chickenofthesea.herokuapp.com/sendLocation', true);
 
 		    xhr.setRequestHeader(
 			   "login", "TimmyBurch"
@@ -34,7 +34,6 @@
 				navigator.geolocation.getCurrentPosition(function(position) {
 					xhr.setRequestHeader("lat", position.coords.latitude);
 					xhr.setRequestHeader("lng", position.coords.longitude);
-
 					pinLocation(position.coords.latitude,position.coords.longitude);
 				});
 			} else {
@@ -65,10 +64,8 @@
 		    	}
 		    };
 
-		    // need to send the login-name and current location
-		    navigator.geolocation.getCurrentPosition(function(position) {
-				// set up postHeader with lat/lng/login
-			});
+		    console.log(xhr.getAllResponseHeaders());
+
 		    xhr.send();
 
 		}
