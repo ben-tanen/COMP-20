@@ -6,3 +6,16 @@
 html, body, #map-canvas {
 	height: 100%;
 }
+
+#map-canvas {
+	z-index: 3;
+}
+
+#legend {
+	width: 100px;
+	height: 100px;
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 2;
+}

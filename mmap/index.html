@@ -24,10 +24,17 @@
 			xhr = new XMLHttpRequest();
 
 		    // open connection with MBTA Redline (JSON file)
-		    xhr.open('post', 'http://chickenofthesea.herokuapp.com/sendLocation', true);
+		    xhr.open('POST', 'http://chickenofthesea.herokuapp.com/sendLocation', true);
+
+		    xhr.setRequestHeader(
+			   "login", "TimmyBurch"
+			);
 
 			if (navigator.geolocation){
 				navigator.geolocation.getCurrentPosition(function(position) {
+					xhr.setRequestHeader("lat", position.coords.latitude);
+					xhr.setRequestHeader("lng", position.coords.longitude);
+
 					pinLocation(position.coords.latitude,position.coords.longitude);
 				});
 			} else {
@@ -46,13 +53,12 @@
 		    	if (xhr.readyState == 4 && xhr.status == 200) {
 		    		var data = JSON.parse(xhr.responseText);
 		    		
-		    		// character = getCharacter(data);
-		    		// put character pin
+		    		console.log(data);
 
-		    		students = data["students"];
-		    		for (i=0;i<students.length;i++){
-		    			// put student pin
-		    		}
+		    		// characters = data["characters"];
+		    		// students = data["students"];
+
+		    		// for each student & character, add pin
 
 		    	} else if (xhr.readyState == 4) {
 		    		console.log('There was an error retrieving the data.');
