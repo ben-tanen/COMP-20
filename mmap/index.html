@@ -19,8 +19,8 @@
 
 	   	if (navigator.geolocation) {
 	   		navigator.geolocation.getCurrentPosition(function(position) {
-			  curr_lat = position.coords.latitude;
-			  curr_lng = position.coords.longitude;
+			  var curr_lat = position.coords.latitude;
+			  var curr_lng = position.coords.longitude;
 			});
 	   	} else {
 	   		// no geolocation
