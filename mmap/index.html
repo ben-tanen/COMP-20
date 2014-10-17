@@ -17,16 +17,6 @@
 		var curr_lat;
 	    var curr_lng;
 
-	   	if (navigator.geolocation) {
-	   		navigator.geolocation.getCurrentPosition(function(position) {
-			  var curr_lat = position.coords.latitude;
-			  var curr_lng = position.coords.longitude;
-			});
-	   	} else {
-	   		// no geolocation
-	   	}
-
-
 		function initializeMap() {
 	    	// set the map options (zoom and location)
 			mapOptions = {
@@ -65,7 +55,18 @@
 		xhr.open('post', 'http://chickenofthesea.herokuapp.com/sendLocation', true);
 		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		xhr.onreadystatechange = getData;
-		xhr.send("login=TimmyBurch&lat=42&lng=-71");  
+
+		if (navigator.geolocation) {
+	   		navigator.geolocation.getCurrentPosition(function(position) {
+			  var curr_lat = position.coords.latitude;
+			  var curr_lng = position.coords.longitude;
+			  xhr.send("login=TimmyBurch&lat=" + curr_lat + "&lng=" + curr_lng); 
+			  console.log("login=TimmyBurch&lat=" + curr_lat + "&lng=" + curr_lng);
+			});
+	   	} else {
+	   		// no geolocation
+	   	}
+		 
 
 		google.maps.event.addDomListener(window, 'load', initializeMap);
 	</script>
