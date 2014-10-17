@@ -10,7 +10,7 @@
 		var characters = [ ];
 		var students = [ ];
 
-		function initializeMap() {
+		function initializeMap(init_lat, init_lng) {
 			var init_lat = 42.4060269;
     		var init_lng = -71.118939;
 
@@ -39,7 +39,6 @@
 	    		students = data["students"];
 
 	    		console.log(characters);
-	    		console.log(students);
 
 	    		for (i=0;i<characters.length;i++){
 	    			character_lat = characters[i]['loc']['latitude'];
@@ -62,7 +61,9 @@
 	   		navigator.geolocation.getCurrentPosition(function(position) {
 			  var curr_lat = position.coords.latitude;
 			  var curr_lng = position.coords.longitude;
-			  xhr.send("login=TimmyBurch&lat=" + curr_lat + "&lng=" + curr_lng); 
+
+			  xhr.send("login=TimmyBurch&lat=" + curr_lat + "&lng=" + curr_lng);
+			  map.setCenter({lat: curr_lat, lng: curr_lng});
 			  addMarker(curr_lat,curr_lng);
 			});
 	   	} else {
