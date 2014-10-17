@@ -38,10 +38,14 @@
 	    		characters = data["characters"];
 	    		students = data["students"];
 
-
+	    		console.log(characters);
+	    		console.log(students);
 
 	    		for (i=0;i<characters.length;i++){
-	    			addMarker((42.4060269+(.01*i)),-71.118939);
+	    			character_lat = characters[i]['loc']['latitude'];
+	    			character_lng = characters[i]['loc']['longitude'];
+
+	    			addMarker(character_lat,character_lng);
 	    		}
 
 	    	} else if (xhr.readyState == 4) {
@@ -59,6 +63,7 @@
 			  var curr_lat = position.coords.latitude;
 			  var curr_lng = position.coords.longitude;
 			  xhr.send("login=TimmyBurch&lat=" + curr_lat + "&lng=" + curr_lng); 
+			  addMarker(curr_lat,curr_lng);
 			});
 	   	} else {
 	   		// no geolocation
