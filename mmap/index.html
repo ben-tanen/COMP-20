@@ -10,7 +10,7 @@
 		var characters = [ ];
 		var students = [ ];
 
-		function initializeMap(init_lat, init_lng) {
+		function initializeMap() {
 			var init_lat = 42.4060269;
     		var init_lng = -71.118939;
 
@@ -24,11 +24,44 @@
 			map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 		}
 
-		function addMarker(in_lat,in_lng) {
+	    function addCharacterMarker(cha_name,cha_lat,cha_lng,cha_note) {
+	    	var name;
+	    	var image;
+
+	    	if (cha_name == 'carmen'){
+	    		name = 'Carmen Sandiego';
+	    		image = 'images/carmen.png';
+	    	} else if (cha_name == 'waldo') {
+	    		name = 'Waldo';
+	    		image = 'images/waldo.png';
+	    	} else if (cha_name == 'batman') {
+	    		name = 'Batman';
+	    		image = 'images/batman.png';
+	    	} else if (cha_name == 'nr') {
+	    		name = 'Professor Norman Ramsey';
+	    		image = 'images/nr.png';
+	    	} else if (cha_name == 'snape') {
+	    		name = 'Professor Severus Snape';
+	    		image = 'images/snape.png';
+	    	} else if (cha_name == 'hescott') {
+	    		name = 'Professor Ben Hescott';
+	    		image = 'images/hescott.png';
+	    	}
+
+	        marker = new google.maps.Marker({
+			    position: {lat: cha_lat, lng: cha_lng},
+			    map: map,
+			    icon: image
+			});
+			return marker;
+	    }
+
+	    function addStudentMarker(in_lat,in_lng) {
 	        marker = new google.maps.Marker({
 			    position: {lat: in_lat, lng: in_lng},
 			    map: map
 			});
+			return marker;
 	    }
 
 		function getData() {
@@ -37,18 +70,27 @@
 
 	    		characters = data["characters"];
 	    		students = data["students"];
-
-	    		console.log(characters);
-
+	    		
 	    		for (i=0;i<characters.length;i++){
-	    			character_lat = characters[i]['loc']['latitude'];
-	    			character_lng = characters[i]['loc']['longitude'];
+	    			cha_name = characters[i]['name'];
+	    			cha_lat = characters[i]['loc']['latitude'];
+	    			cha_lng = characters[i]['loc']['longitude'];
+	    			cha_note = characters[i]['loc']['note'];
 
-	    			addMarker(character_lat,character_lng);
+	    			addCharacterMarker(cha_name,cha_lat,cha_lng,cha_note);
+	    		}
+
+	    		for (i=0;i<students.length;i++){
+	    			stu_login = students[i]['login'];
+	    			stu_lat = students[i]['lat'];
+	    			stu_lng = students[i]['lng'];
+	    			stu_time = students[i]['created_at'];
+	    			
+	    			addStudentMarker(stu_lat,stu_lng);
 	    		}
 
 	    	} else if (xhr.readyState == 4) {
-	    		console.log('There was an error retrieving the data.');
+	    		// error message
 	    	}
 		}
 		
@@ -59,13 +101,18 @@
 
 		if (navigator.geolocation) {
 	   		navigator.geolocation.getCurrentPosition(function(position) {
-			  var curr_lat = position.coords.latitude;
-			  var curr_lng = position.coords.longitude;
+				var curr_lat = position.coords.latitude;
+				var curr_lng = position.coords.longitude;
 
-			  xhr.send("login=TimmyBurch&lat=" + curr_lat + "&lng=" + curr_lng);
+				xhr.send("login=TimmyBurch&lat=" + curr_lat + "&lng=" + curr_lng);
 
-			  map.setCenter({lat: curr_lat, lng: curr_lng});
-			  addMarker(curr_lat,curr_lng);
+				map.setCenter({lat: curr_lat, lng: curr_lng});
+				marker = new google.maps.Marker({
+					position: {lat: curr_lat, lng: curr_lng},
+					map: map,
+					icon: 'images/timmy.png',
+					zIndex: 100
+				});
 			});
 	   	} else {
 	   		// no geolocation
