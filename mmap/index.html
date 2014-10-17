@@ -38,7 +38,9 @@
 	    		characters = data["characters"];
 	    		students = data["students"];
 
-	    		addMarker(42.4260269,-71.118939);
+	    		for (i=0;i<characters.length;i++){
+	    			addMarker((42.4060269+.01),-71.118939);
+	    		}
 
 	    	} else if (xhr.readyState == 4) {
 	    		console.log('There was an error retrieving the data.');
