@@ -7,57 +7,67 @@
 	</script>
 	<link rel="stylesheet" href="style.css">
 	<script>
-		function initialize() {
-			// standard tufts coordinates
-			var init_lat = 42.4060269;
-	    	var init_lng = -71.118939;
+		var characters = [ ];
+		var students = [ ];
 
+		// standard tufts coordinates
+		var init_lat = 42.4060269;
+    	var init_lng = -71.118939;
+
+		var curr_lat;
+	    var curr_lng;
+
+	   	if (navigator.geolocation) {
+	   		navigator.geolocation.getCurrentPosition(function(position) {
+			  curr_lat = position.coords.latitude;
+			  curr_lng = position.coords.longitude;
+			});
+	   	} else {
+	   		// no geolocation
+	   	}
+
+
+		function initializeMap() {
 	    	// set the map options (zoom and location)
-			var mapOptions = {
+			mapOptions = {
 				center: {lat: init_lat, lng: init_lng},
 				zoom: 12
 			};
 
 			// create the map
-			var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-
-			xhr = new XMLHttpRequest();
-
-		    // open connection with sendLocation server
-		    xhr.open('post', 'http://chickenofthesea.herokuapp.com/sendLocation', true);
-
-			xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		  
-
-			function pinLocation(input_lat,input_lng) {
-				var marker = new google.maps.Marker({
-				    position: {lat: input_lat, lng: input_lng},
-				    map: map
-				});
-			}
-
-		    // if change in readystate, update pins
-		    xhr.onreadystatechange = function() {
-		    	if (xhr.readyState == 4 && xhr.status == 200) {
-		    		var data = JSON.parse(xhr.responseText);
-		    		
-		    		console.log(data);
-
-		    		// characters = data["characters"];
-		    		// students = data["students"];
-
-		    		// for each student & character, add pin
-
-		    	} else if (xhr.readyState == 4) {
-		    		console.log('There was an error retrieving the data.');
-		    	}
-		    };
-
-		    xhr.send("login=TimmyBurch&lat=47&lng=23");
+			map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 		}
 
-		// call google map on page load
-		google.maps.event.addDomListener(window, 'load', initialize);
+		function addMarker(in_lat,in_lng) {
+	        marker = new google.maps.Marker({
+			    position: {lat: in_lat, lng: in_lng},
+			    map: map
+			});
+	    }
+
+		function getData() {
+			if (xhr.readyState == 4 && xhr.status == 200) {
+	    		var data = JSON.parse(xhr.responseText);
+
+	    		characters = data["characters"];
+	    		students = data["students"];
+
+	    		console.log(students);
+
+	    	} else if (xhr.readyState == 4) {
+	    		console.log('There was an error retrieving the data.');
+	    	}
+		}
+
+		console.log(curr_lat,curr_lng);
+		
+		xhr = new XMLHttpRequest();
+		xhr.open('post', 'http://chickenofthesea.herokuapp.com/sendLocation', true);
+		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xhr.onreadystatechange = getData;
+		xhr.send("login=TimmyBurch&lat=42&lng=-71");  
+
+		google.maps.event.addDomListener(window, 'load', initializeMap);
 	</script>
 </head>
 <body>
