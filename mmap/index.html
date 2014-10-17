@@ -38,8 +38,10 @@
 	    		characters = data["characters"];
 	    		students = data["students"];
 
+
+
 	    		for (i=0;i<characters.length;i++){
-	    			addMarker((42.4060269+.01),-71.118939);
+	    			addMarker((42.4060269+(.01*i)),-71.118939);
 	    		}
 
 	    	} else if (xhr.readyState == 4) {
