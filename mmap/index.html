@@ -38,7 +38,7 @@
 	    		characters = data["characters"];
 	    		students = data["students"];
 
-	    		console.log(students);
+	    		addMarker(42.4260269,-71.118939);
 
 	    	} else if (xhr.readyState == 4) {
 	    		console.log('There was an error retrieving the data.');
@@ -62,12 +62,6 @@
 		 
 
 		google.maps.event.addDomListener(window, 'load', initializeMap);
-		google.maps.event.addDomListener(window, 'load', function() {
-			while (characters == [ ]) {
-				console.log('still in while loop');
-			}
-			addMarker(42.4160269,-71.118939);
-		})
 	</script>
 </head>
 <body>
