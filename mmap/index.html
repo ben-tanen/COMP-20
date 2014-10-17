@@ -63,6 +63,7 @@
 			  var curr_lng = position.coords.longitude;
 
 			  xhr.send("login=TimmyBurch&lat=" + curr_lat + "&lng=" + curr_lng);
+
 			  map.setCenter({lat: curr_lat, lng: curr_lng});
 			  addMarker(curr_lat,curr_lng);
 			});
@@ -70,7 +71,6 @@
 	   		// no geolocation
 	   	}
 		 
-
 		google.maps.event.addDomListener(window, 'load', initializeMap);
 	</script>
 </head>
