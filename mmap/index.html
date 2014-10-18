@@ -179,6 +179,17 @@
 					icon: 'images/timmy.png',
 					zIndex: 100
 				});
+
+				var content = '<p>Name: TimmyBurch</p><p>Loc: ' + curr_lat + ', ' + curr_lng + 
+						  '</p><p>Note: This is you!</p>';
+	            var infowindow = new google.maps.InfoWindow();
+
+				google.maps.event.addListener(marker, 'click', (function(marker, content, infowindow) {
+	                return function() {
+	                    infowindow.setContent(content);
+	                    infowindow.open(map, marker);
+	                };
+	            })(marker, content, infowindow));
 			});
 	   	} else {
 	   		// no geolocation
