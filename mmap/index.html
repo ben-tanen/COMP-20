@@ -10,6 +10,7 @@
 	<script>
 		var characters = [ ];
 		var students = [ ];
+		var polyline_colors = ['#77bdee', '#089d55', '#4486f7'];
 
 		function initializeMap() {
 			var init_lat = 42.4060269;
@@ -23,6 +24,8 @@
 
 			// create the map
 			map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(
+  			document.getElementById('legend'));
 		}
 
 	    function addCharacterMarker(cha_name,cha_lat,cha_lng,cha_note) {
@@ -54,20 +57,66 @@
 			    map: map,
 			    icon: image
 			});
+
+			var content = '<p>Name: ' + name + '</p><p>Loc: ' + cha_lat + ', ' + cha_lng + 
+						  '</p><p>Note: ' + cha_note + '</p>';
+            var infowindow = new google.maps.InfoWindow();
+
+			google.maps.event.addListener(marker, 'click', (function(marker, content, infowindow) {
+                return function() {
+                    infowindow.setContent(content);
+                    infowindow.open(map, marker);
+                };
+            })(marker, content, infowindow));
+
+			if (navigator.geolocation) {
+		   		navigator.geolocation.getCurrentPosition(function(position) {
+					var curr_lat = position.coords.latitude;
+					var curr_lng = position.coords.longitude;
+
+					var flightPath = new google.maps.Polyline({
+					    path: [{lat: cha_lat, lng: cha_lng}, {lat: curr_lat, lng: curr_lng}],
+					    geodesic: true,
+					    strokeColor: polyline_colors[Math.floor(Math.random() * polyline_colors.length)],
+					    strokeOpacity: 1.0,
+					    strokeWeight: 2
+					});
+
+					flightPath.setMap(map);
+
+					document.getElementById('legend').innerHTML += '<p>' + name + ': ' +
+						getDistance({lat: cha_lat, lng: cha_lng},{lat: curr_lat, lng: curr_lng}).toFixed(2) + ' miles away</p>';
+				});
+		   	}
+
 			return marker;
 	    }
 
-	    function addStudentMarker(in_lat,in_lng) {
+	    function addStudentMarker(stu_login,stu_lat,stu_lng,stu_time) {
 	        marker = new google.maps.Marker({
-			    position: {lat: in_lat, lng: in_lng},
+			    position: {lat: stu_lat, lng: stu_lng},
 			    map: map
 			});
+
+			var content = '<p>Login: ' + stu_login + '</p><p>Loc: ' + stu_lat + ', ' + stu_lng + 
+						  '</p><p>Created At: ' + stu_time + '</p>';
+            var infowindow = new google.maps.InfoWindow();
+
+			google.maps.event.addListener(marker, 'click', (function(marker, content, infowindow) {
+                return function() {
+                    infowindow.setContent(content);
+                    infowindow.open(map, marker);
+                };
+            })(marker, content, infowindow));
+
 			return marker;
 	    }
 
 		function getData() {
 			if (xhr.readyState == 4 && xhr.status == 200) {
 	    		var data = JSON.parse(xhr.responseText);
+
+	    		document.getElementById('legend').innerHTML = "<p id='legend_title'>Character Legend</p>";
 
 	    		characters = data["characters"];
 	    		students = data["students"];
@@ -87,12 +136,28 @@
 	    			stu_lng = students[i]['lng'];
 	    			stu_time = students[i]['created_at'];
 	    			
-	    			addStudentMarker(stu_lat,stu_lng);
+	    			addStudentMarker(stu_login,stu_lat,stu_lng,stu_time);
 	    		}
 
 	    	} else if (xhr.readyState == 4) {
 	    		// error message
 	    	}
+		}
+
+		function rad(x) {
+			  return x * Math.PI / 180;
+		}
+
+		function getDistance(p1, p2) {
+			var R = 6378137; // Earth’s mean radius in meter
+			var dLat = rad(p2['lat'] - p1['lat']);
+			var dLong = rad(p2['lng'] - p1['lng']);
+			var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+				Math.cos(rad(p1['lat'])) * Math.cos(rad(p2['lat'])) *
+				Math.sin(dLong / 2) * Math.sin(dLong / 2);
+			var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+			var d = (R * c)/1609.34;
+			return d; // returns the distance in miles
 		}
 		
 		xhr = new XMLHttpRequest();
@@ -124,5 +189,8 @@
 </head>
 <body>
 	<div id="map-canvas"></div>
+	<div id="legend">
+  		<p>Loading...</p>
+	</div>
 </body>
 </html>
