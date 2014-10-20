@@ -10,7 +10,8 @@
 	<script>
 		var characters = [ ];
 		var students = [ ];
-		var polyline_colors = ['#77bdee', '#089d55', '#4486f7'];
+		var polyline_colors = ['#089d55', '#4486f7', '#fe7a15'];
+		var charDist = [ ];
 
 		function initializeMap() {
 			var init_lat = 42.4060269;
@@ -84,11 +85,21 @@
 
 					flightPath.setMap(map);
 
-					document.getElementById('legend').innerHTML += '<p>' + name + ': ' +
-						getDistance({lat: cha_lat, lng: cha_lng},{lat: curr_lat, lng: curr_lng}).toFixed(2) + ' miles away</p>';
+					charDist.push({'name': name, 'dist': parseFloat(getDistance({lat: cha_lat, lng: cha_lng},{lat: curr_lat, lng: curr_lng}).toFixed(2))});
+
+					document.getElementById('legend').innerHTML = "<p id='legend_title'>Character Legend</p>";
+
+					charDist.sort(function(a, b) {
+				        var x = a['dist']; var y = b['dist'];
+				        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+				    });
+
+					for (i=0;i<charDist.length;i++){
+						document.getElementById('legend').innerHTML += '<p>' + charDist[i]['name'] + ': ' +
+						charDist[i]['dist'] + ' miles away</p>';
+					}
 				});
 		   	}
-
 			return marker;
 	    }
 
@@ -116,7 +127,7 @@
 			if (xhr.readyState == 4 && xhr.status == 200) {
 	    		var data = JSON.parse(xhr.responseText);
 
-	    		document.getElementById('legend').innerHTML = "<p id='legend_title'>Character Legend</p>";
+	    		// document.getElementById('legend').innerHTML = "<p id='legend_title'>Character Legend</p>";
 
 	    		characters = data["characters"];
 	    		students = data["students"];
@@ -129,6 +140,8 @@
 
 	    			addCharacterMarker(cha_name,cha_lat,cha_lng,cha_note);
 	    		}
+
+
 
 	    		for (i=0;i<students.length;i++){
 	    			stu_login = students[i]['login'];
