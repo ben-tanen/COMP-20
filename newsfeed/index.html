@@ -4,15 +4,27 @@
 
 <head>
 	<title>My News Feed</title>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script>
-	  // Most of your work will be done here...
+		$(document).ready(function() {
+			// re-list all key-values in localStorage
+			for (key in localStorage) {
+				$('#news').prepend('<p>' + key + ' - ' + localStorage[key] + '</p>');
+			}
+		});
+
+		function feedUpdate() {
+			var now = new Date();
+	  		var msg = $('#msg').val();
+	  		$('#news').prepend('<p>' + now + ' - ' + msg + '</p>');
+	  		localStorage[now] = msg;
+	  	}
 	</script>
 </head>
 
 <body>
 	<h1>My News Feed</h1>
-	<h3>My news update: <input type="text" id="msg" name="msg" size="30" /></h3>
-	<div id="news">News...</div>
+	<h3>My news update: <input type="text" id="msg" name="msg" size="30" onchange='feedUpdate()' /></h3>
+	<div id="news"></div>
 </body>
 </html>
