@@ -104,17 +104,10 @@
 	    }
 
 	    function addStudentMarker(stu_login,stu_lat,stu_lng,stu_time) {
-	    	console.log('before marker');
-
-	    	console.log(stu_lat);
-	    	console.log(stu_lng);
-
 	        marker = new google.maps.Marker({
 			    position: {lat: stu_lat, lng: stu_lng},
 			    map: map
 			});
-
-			console.log('after marker');
 
 			var content = '<p>Login: ' + stu_login + '</p><p>Loc: ' + stu_lat + ', ' + stu_lng + 
 						  '</p><p>Created At: ' + stu_time + '</p>';
@@ -155,10 +148,8 @@
 	    			stu_lat = students[i]['lat'];
 	    			stu_lng = students[i]['lng'];
 	    			stu_time = students[i]['created_at'];
-
-	    			console.log('before adding student');
 	    			
-	    			addStudentMarker(stu_login,parseFloat(stu_lat),parseFloat(stu_lng),stu_time);
+	    			addStudentMarker(stu_login,stu_lat,stu_lng,stu_time);
 	    		}
 
 	    	} else if (xhr.readyState == 4) {
