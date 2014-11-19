@@ -40,23 +40,24 @@
 		    xhr = new XMLHttpRequest();
 
 		    // open connection with MBTA Redline (JSON file)
-		    xhr.open('get', 'http://developer.mbta.com/lib/rthr/red.json', true);
+		    xhr.open('get', 'http://nameless-garden-8127.herokuapp.com/redline.json', true);
 
 		    // if change in readystate, update pins
 		    xhr.onreadystatechange = function() {
 		    	if (xhr.readyState == 4 && xhr.status == 200) {
 		    		data = JSON.parse(xhr.responseText);
-		    		var markers;
+		    		var markers = [ ];
 
 		    		// for each train in "trips", place a pin
 		    		for (i=0;i<data["TripList"]["Trips"].length;i++){
 		    			var trip = data["TripList"]["Trips"][i];
 		    			var pin_lat = trip["Position"]["Lat"];
 		    			var pin_lng = trip["Position"]["Long"];
-		    			markers[i] = new google.maps.Marker({
+		    			var new_marker = new google.maps.Marker({
 						    position: {lat: pin_lat, lng: pin_lng},
 						    map: map
 						});
+						markers.push(new_marker);
 		    		}
 		    	} else if (xhr.readyState == 4) {
 		    		// console.log('There was an error retrieving the MBTA data.');
