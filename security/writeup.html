@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Security Check | Assignment #4 | Ben Tanen</title>
+<meta charset="UTF-8">
+<!-- Following CSS Provided by Markdown Converter
+     Write-up originally written in .md and then converted -->
+<link rel="stylesheet" href="chrome-extension://jmchmkecamhbiokiopfpnfgbidieafmd/markdown.css" />
+<style>
+    .issue_title {
+        font-weight: bold;
+    }
+
+    .severe {
+        color: red;
+    }
+
+    .moderate {
+        color: orange;
+    }
+</style>
+</head>
+<body>
+<h1>Security Report for Marauder's Map &amp; Where in the World</h1>
+
+<p>By Ben Tanen</p>
+
+<hr>
+
+<h3>Introduction</h3>
+
+<p>The products being tested are Simon Warchol's Marauder's Map and WhereInTheWorld assignments for COMP-20 (F14). </p>
+
+<p>The goal/purpose of the Marauder's Map was to send the user's geolocation to a server and handle the returned data. This returned data was a collection of up to 100 logins and associated locations. These locations would then be mapped on a map (using Google Maps).</p>
+
+<p>The goal/purpose of the WhereInTheWorld assignment was to make the back-end server that was ultimately used by the Marauder's Map. It was to have multiple APIs including: users could send their login &amp; location and be returned the previously stored data, users could search for a specific login and view any of it's associated data, users could view all of the data on the root page, users could be passed the data from the MBTA's redline.json.</p>
+
+<p>My purpose, as a security tester, is to test the two applications and discover any vulnerabilities in their implementation. For the purpose of this report, vulnerabilities included gaps in security that have potential to lead to application failure (the extent of this failure is described below). The following report outlines such vulnerabilities and potential solutions to resolve these issues.</p>
+
+<h3>Methodology</h3>
+
+<p>The assessment of these applications was broken down into two parts: "black-box" assessment and source code review. In order to test the actual vulnerabilities, the command-line tool <code>curl</code> was used to send various data to the <code>/sendLocations</code> API of the WhereInTheWorld application. The handling of this data led to the issues described.</p>
+
+<h3>Abstract of Findings</h3>
+
+<p>After testing the two applications, it appears the apparent security issues are related to a lack of data validation throughout both applications. Most of the user data throughout both applications were not validated to check for proper input, since there was an inappropriate amount of faith in the user and their inputs. Because of this, with knowledge of these security gaps, hackers have the potential to cause major damage to these two applications.</p>
+
+<p>The first issue, and a major issue in many websites, was the potential for cross-site scripting. This leaves open the possibility for users to inject unauthorized code to tamper with the operation of the application. Additionally, through the use of tools like <code>curl</code> and <a href="https://addons.mozilla.org/en-US/firefox/addon/tamper-data/">Tamper Data</a> for Firefox, users are able to forge their geolocation data, ultimately inputting false information into the database. Another issue was the lack of validation in the Marauder's Map's data, leaving the possibility for the client-side JavaScript to fail due to invalid data/data-types. Finally, another validation error lies in the <code>/locations.json</code> API where users have the possibility to pull the location data of everyone, even though users are meant to only get filtered data for a specific login from this API.</p>
+
+<p>For more information on these vulnerabilities, see below.</p>
+
+<h3>Issues Found</h3>
+
+<p>These issues are listed in order of their importance / severity.</p>
+
+<p><span class='issue_title'>Cross-Site Scripting</span> (<span class='severe'>SEVERE</span>): The first major issue found was the potential for cross-site scripting (including JavaScript injection). This issue was found in the <code>/sendLocation</code> API of assignment #3. The user is suppose to input a login, latitude and longitude view a HTTP POST request, and upon successful submission of data (either via <code>curl</code> or the Marauder's Map), the user is returned all of the previously submitted data from the Mongo DB. The security issue arises because the API does not check the contents of the login/latitude/longitude data. Because of this, it is possible to insert small (or large) client-side scripts, like the JavaScript seen here:</p>
+
+<p><img src="JSInsertion.png" alt="JavaScipt Injection" title=""></p>
+
+<p>By using tools like <code>curl</code> or Tamper Data, scripts can be sent into the database that can cause an array of issues with the applications, including the example below. <em>Note:</em> the header style "yooo" seen below is another example of invalid data that could be sent (<code>&lt;h1&gt;Yooo&lt;/h1&gt;</code>) that isn't quite XSS.</p>
+
+<p><img src="JSAlert.png" alt="JavaScript Injection Alert" title=""></p>
+
+<p>Because of the many possibilities of client-side scripts and the creativity hackers, cross-site scripting can be a major issue that should be resolved ASAP. A possible way to resolve this issue (at least in terms of this assignment) is to filter out any data that includes signs of XSS (like the JS <code>&lt;script&gt;</code> tag). An example for how that might be done (using regular expressions) includes: <code>var login = (request.body.lat).replace(/&lt;script&gt;.*&lt;\/script&gt;/g, '')</code>. By using this sort of trimming/replacing for user data, the possibility for XSS is drastically minimized.</p>
+
+<p><span class='issue_title'>Query All Location Data with Request Injection Attack</span> (<span class='severe'>SEVERE</span>): Another severe security vulnerability is the request injection attacks possible through MongoDB and the <code>/locations.json</code> API. The purpose of this API is to return the data associated with a specific login in JSON format. If a valid login is provided via an HTTP GET request, the data is returned. If an invalid login (or no login) is provided, a blank array is returned. For security purposes, this could be so that a specific user can only view their own location data and no one else's. However, by using request injection attacks via MongoDB, it is possible to obtain all of the location data by bypassing the login validation. In this specific application, there are a few ways to perform these attacks, and they include the following examples (and the data that is returned):</p>
+
+<pre><code>[app_url]/locations.json?login[$ne]=yooo // return all data with logins NOT EQUAL to yooo
+[app_url]/locations.json?login[$regex]=.* // return all data matching the regular expression for everything
+[app_url]/locations.json?login[$gt]= // return all data greater than 'void'
+</code></pre>
+
+<p><img src="requestData.png" alt="Returned Data after Request Injection Attack" title=""></p>
+
+<p>Any of these expressions / queries will return all of the data stored (except for data with 'yooo' and/or 'void' as the login) which is very much beyond the intended scope of what the user should be capable of. Whereas the user is only suppose to get a single login's data (or nothing), a user could get all of the data, potentially revealing private data not intended for the user. Obviously, because of the potential danger behind this sort of attack, it is a severe vulnerability that should be fixed ASAP.</p>
+
+<p>The best way to combat this type of attack is to (again) validate the type and contents of the data that is being sent to the database. In this case, a simple way to validate the contents is to cast these requests to strings, therefore limiting their potential for attack. Example code would be:</p>
+
+<pre><code>// change 1st line (current code) to 2nd line
+var login = request.body.login;
+var login = String(request.body.login);
+</code></pre>
+
+<p>If the code were to be swapped and a user were to attempt a request injection attack, the request would simply search for the string '[object Object]' which would return nothing (unless a login was for some reason actually '[object Object]').</p>
+
+<p><span class='issue_title'>Invalid Location Data Types for Marauder's Map</span> (<span class='moderate'>MODERATE</span>): Again similar to the XSS issue above, this vulnerability in assignment #2 requires data validation. Once the user sends their location data, they will in turn receive the previously submitted data from the database. From here, the assignment is set up to place markers at all of these positions, where the positions are in floats describing the latitude and longitude. This operation would obviously run into issues if the location data is not actually in float / number form, such as a string. However, there is no validation to make sure that floats are passed to assignment #2 / the marker placing function, and this is where the security issue arises.</p>
+
+<p><img src="floatCommand.png" alt="Sending Non-valid Float Locations" title=""></p>
+
+<p><img src="floatTable.png" alt="Stored Invalid Non-Float Data" title=""></p>
+
+<p>Again using tools like <code>curl</code>, I was able to pass location data that was non-float successfully and see it stored in the database (see above images). This shows that these non-float data points are in the database and would then be passed to assignment #2, causing failure when it attempts to place a pin at "this_isnt_a_float".</p>
+
+<p>There are a few approaches available to prevent this. First of all, like the above issues, data validation through the <code>/sendLocation</code> API could check if the location data is in fact numeric. If it isn't, the server simply wouldn't store the data. Another solution is on the client-side end of assignment #2 where a pin is only placed for data with float location points. Example code that would do this includes:</p>
+
+<pre><code>function addStudentMarker(stu_login,stu_lat,stu_lng,stu_time) {
+    if ( IsNumeric(stu_lat) &amp;&amp; IsNumeric(stu_lng) ) {
+        marker = new google.maps.Marker({
+            position: {lat: stu_lat, lng: stu_lng},
+            map: map
+        });
+
+        // continue handling marker
+        // ...
+    } else {
+        // return with no marker
+        // ...
+    }
+}
+</code></pre>
+
+<p><span class='issue_title'>Sending Invalid / Unverified Data via Curl</span> (<span class='moderate'>MODERATE</span>): Similar to the previous vulnerabilities, this issue is again based on unchecked invalid/unverified data found in <code>/sendLocation</code>. One of the main purposes of assignment #2 was to obtain and send the user's actual geolocation to the server. However, because of the capabilities of tools like <code>curl</code>, Data Tamper and the lack of data validation in these applications, users have the ability to send in invalid location data, creating an inaccurate map for assignment #2. An example <code>curl</code> command that submits invalid data is included. As you can see, when the data is represented on the map in assignment #2, it has the user "yooo" off the coast Ghana, where the user was clearly not (it was actually sent from Tufts).</p>
+
+<p><img src="curl_command.png" alt="Sending Invalid Data from Curl" title=""></p>
+
+<p><img src="curlMap.png" alt="Example of Invalid Data from Curl" title=""></p>
+
+<p>While this issue does not cause any direct damage to the application as a whole, it allows users to take control in a way that is not intended for the application. The Marauder's Map is suppose to take the user's actual location so that should be the only possibility.</p>
+
+<p>To validate that the locations that are being received by the server are valid, the server could run an additional check to cross reference the locations with the IP address of sender. By using Express' <code>req.ip</code> and geolocation software like <a href="http://dev.maxmind.com/geoip/legacy/geolite/">Geolite</a>, the user's location can be verified within a band of certainty. Exact implementation would vary from implementation to implementation, but the code would work somewhat like:</p>
+
+<pre><code>Store provided location (`lat`, `lng`) and IP (`req.ip`)
+Use Geolite (or similar tool) to convert IP to geolocation (coordinate)
+Verify that IP-converted geolocation is within a certain distance of provided location (distance can vary)
+If locations are valid, store data in DB
+If locations are invalid, reject data
+</code></pre>
+
+<hr>
+
+<h3>Conclusion</h3>
+
+<p>Overall, the security issues in these applications have to do with a lack of data validation and safety when dealing with user input. It's impossible to be 100% safe, but by implementing the above security checks, these applications would be significantly safer from attack. While implementing these changes would increase security, they would make the operation of running these two applications more complicated. Data validation can be simply for some things and more complicated for others. For more complicated validation, outside APIs might need to be consulted/used, which adds complexity to the project, perhaps beyond what is desired. Thus, we come to the question of how far is far enough for security? You can always implement more security, but where is the point where you end up putting more effort into adding security than the additional protection is providing?</p>
+
+<p>These assignments were not built with the intention of being 100% secure, so their gaps make sense. For future projects, if security is of concern, it would be best to implement the above suggests and make sure trust is not inappropriately put in input data.</p>
+</body>
+</html>
