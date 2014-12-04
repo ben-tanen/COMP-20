@@ -55,7 +55,7 @@
 
 <p><span class='issue_title'>Cross-Site Scripting</span> (<span class='severe'>SEVERE</span>): The first major issue found was the potential for cross-site scripting (including JavaScript injection). This issue was found in the <code>/sendLocation</code> API of assignment #3. The user is suppose to input a login, latitude and longitude view a HTTP POST request, and upon successful submission of data (either via <code>curl</code> or the Marauder's Map), the user is returned all of the previously submitted data from the Mongo DB. The security issue arises because the API does not check the contents of the login/latitude/longitude data. Because of this, it is possible to insert small (or large) client-side scripts, like the JavaScript seen here:</p>
 
-<p><img src="JSInsertion.png" alt="JavaScipt Injection" title=""></p>
+<p><img src="JSinsertion.png" alt="JavaScipt Injection" title=""></p>
 
 <p>By using tools like <code>curl</code> or Tamper Data, scripts can be sent into the database that can cause an array of issues with the applications, including the example below. <em>Note:</em> the header style "yooo" seen below is another example of invalid data that could be sent (<code>&lt;h1&gt;Yooo&lt;/h1&gt;</code>) that isn't quite XSS.</p>
 
