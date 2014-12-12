@@ -2,7 +2,7 @@
 
 This project uses a combination of Google Maps API and XMLHttpRequest to obtain geo-location information about an array of characters and students. These characters and students are plotting on the map, as well as the user's current location (displayed as an image of TimmyBurch from South Park). The polylines are drawn between the user (Timmy) and all of the characters that are plotted (including Carmen San Diego, Batman, Prof. Hescott, etc) and the distances between the characters are shown in an overlay box.
 
-See the assignment [here](http://tuftsdev.github.io/comp20-btanen/mmap/).
+See the assignment [here](http://ben-tanen.github.io/comp20/mmap/).
 
 As of writting this, all of the assigned aspects of this assignment were implemented correctly.
 
